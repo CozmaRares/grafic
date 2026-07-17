@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SarbatoriRouteImport } from './routes/sarbatori'
 import { Route as AngajatiRouteImport } from './routes/angajati'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnLunaRouteImport } from './routes/$an.$luna'
 import { Route as AnLunaPrintPrintSlugRouteImport } from './routes/$an.$luna_.print.$printSlug'
 
@@ -22,6 +23,11 @@ const SarbatoriRoute = SarbatoriRouteImport.update({
 const AngajatiRoute = AngajatiRouteImport.update({
   id: '/angajati',
   path: '/angajati',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnLunaRoute = AnLunaRouteImport.update({
@@ -36,12 +42,14 @@ const AnLunaPrintPrintSlugRoute = AnLunaPrintPrintSlugRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/angajati': typeof AngajatiRoute
   '/sarbatori': typeof SarbatoriRoute
   '/$an/$luna': typeof AnLunaRoute
   '/$an/$luna/print/$printSlug': typeof AnLunaPrintPrintSlugRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/angajati': typeof AngajatiRoute
   '/sarbatori': typeof SarbatoriRoute
   '/$an/$luna': typeof AnLunaRoute
@@ -49,6 +57,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/angajati': typeof AngajatiRoute
   '/sarbatori': typeof SarbatoriRoute
   '/$an/$luna': typeof AnLunaRoute
@@ -57,11 +66,21 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/angajati' | '/sarbatori' | '/$an/$luna' | '/$an/$luna/print/$printSlug'
+    | '/'
+    | '/angajati'
+    | '/sarbatori'
+    | '/$an/$luna'
+    | '/$an/$luna/print/$printSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/angajati' | '/sarbatori' | '/$an/$luna' | '/$an/$luna/print/$printSlug'
+  to:
+    | '/'
+    | '/angajati'
+    | '/sarbatori'
+    | '/$an/$luna'
+    | '/$an/$luna/print/$printSlug'
   id:
     | '__root__'
+    | '/'
     | '/angajati'
     | '/sarbatori'
     | '/$an/$luna'
@@ -69,6 +88,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AngajatiRoute: typeof AngajatiRoute
   SarbatoriRoute: typeof SarbatoriRoute
   AnLunaRoute: typeof AnLunaRoute
@@ -91,6 +111,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AngajatiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$an/$luna': {
       id: '/$an/$luna'
       path: '/$an/$luna'
@@ -109,6 +136,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AngajatiRoute: AngajatiRoute,
   SarbatoriRoute: SarbatoriRoute,
   AnLunaRoute: AnLunaRoute,
