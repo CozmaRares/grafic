@@ -7,10 +7,8 @@ services:
         - env
     env_file:
       - .env
-    environment:
-      DATABASE_URL: /data/dev.db
     volumes:
-      - ${GRAFIC_DATA_DIR:-./server-data}:/data
+      - ${GRAFIC_DATA_DIR:?GRAFIC_DATA_DIR is required}:/data
     command:
       - pnpm
       - run
@@ -28,10 +26,8 @@ services:
         - env
     env_file:
       - .env
-    environment:
-      DATABASE_URL: /data/dev.db
     volumes:
-      - ${GRAFIC_DATA_DIR:-./server-data}:/data
+      - ${GRAFIC_DATA_DIR:?GRAFIC_DATA_DIR is required}:/data
     depends_on:
       migrate:
         condition: service_completed_successfully
