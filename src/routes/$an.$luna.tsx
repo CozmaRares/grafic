@@ -365,23 +365,21 @@ function RouteComponent() {
                                   <h2 className="text-lg font-bold">
                                       {group.title}
                                   </h2>
-                                  {group.showHourTotals === false ? null : (
-                                      <Link
-                                          className="inline-flex items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
-                                          params={{
-                                              an: String(year),
-                                              luna: String(monthIndex + 1),
-                                              printSlug: group.printSlug,
-                                          }}
-                                          to="/$an/$luna/print/$printSlug"
-                                      >
-                                          <Printer
-                                              aria-hidden="true"
-                                              className="size-4"
-                                          />
-                                          Print
-                                      </Link>
-                                  )}
+                                  <Link
+                                      className="inline-flex items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
+                                      params={{
+                                          an: String(year),
+                                          luna: String(monthIndex + 1),
+                                          printSlug: group.printSlug,
+                                      }}
+                                      to="/$an/$luna/print/$printSlug"
+                                  >
+                                      <Printer
+                                          aria-hidden="true"
+                                          className="size-4"
+                                      />
+                                      Print
+                                  </Link>
                               </div>
                               <ScheduleTable
                                   expectedDailyShiftCount={
