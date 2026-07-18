@@ -1,0 +1,12 @@
+.git
+.output
+node_modules
+.env
+.env.*
+Dockerfile
+compose.yaml
+docker-compose*.yml
+npm-debug.log*
+pnpm-debug.log*
+*.db
+*.db-*

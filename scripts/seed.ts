@@ -2,7 +2,7 @@ import { input } from "@inquirer/prompts";
 import { config } from "dotenv";
 import { sql } from "drizzle-orm";
 
-config({ path: [".env.local", ".env"] });
+config({ path: ".env" });
 
 const [{ db }, schema] = await Promise.all([
     import("../src/db/connection"),

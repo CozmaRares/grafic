@@ -1,0 +1,48 @@
+services:
+  migrate:
+    build:
+      context: .
+      target: build
+      secrets:
+        - env
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: /data/dev.db
+    volumes:
+      - ./server-data:/data
+    command:
+      - pnpm
+      - run
+      - ${DRIZZLE_UDATE_DB_COMMAND}
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  grafic:
+    build:
+      context: .
+      secrets:
+        - env
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: /data/dev.db
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server-data:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+secrets:
+  env:
+    file: .env

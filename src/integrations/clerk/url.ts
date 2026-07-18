@@ -1,7 +1,7 @@
 const SIGN_IN_URL = import.meta.env.VITE_CLERK_SIGN_IN_URL;
 
 if (!SIGN_IN_URL) {
-    throw new Error("Add your Clerk Sign In URL to the .env.local file");
+    throw new Error("Add your Clerk Sign In URL to the .env file");
 }
 
 export function getClerkSignInUrl(redirectUrl: string) {
