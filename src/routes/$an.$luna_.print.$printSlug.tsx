@@ -17,7 +17,9 @@ const printScheduleSchema = z.object({
 
 const getPrintSchedule = createServerFn({ method: "GET" })
     .validator(printScheduleSchema)
-    .handler(({ data }) => unwrapServerResult(getPrintScheduleView(data)));
+    .handler(async ({ data }) => {
+        return unwrapServerResult(getPrintScheduleView(data));
+    });
 
 export const Route = createFileRoute("/$an/$luna_/print/$printSlug")({
     loader: async ({ params }) => {

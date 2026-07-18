@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { CalendarDays } from "lucide-react";
 import { z } from "zod";
 import {
     getLegalHolidayYear,
@@ -40,13 +41,15 @@ type FormStatus = {
 
 const getHolidayYear = createServerFn({ method: "GET" })
     .validator(yearSchema)
-    .handler(({ data }) => unwrapServerResult(getLegalHolidayYear(data.year)));
+    .handler(async ({ data }) => {
+        return unwrapServerResult(getLegalHolidayYear(data.year));
+    });
 
 const saveVariableLegalHolidayDate = createServerFn({ method: "POST" })
     .validator(variableHolidayDateSchema)
-    .handler(({ data }) =>
-        unwrapServerResult(saveVariableLegalHolidayDateRecord(data)),
-    );
+    .handler(async ({ data }) => {
+        return unwrapServerResult(saveVariableLegalHolidayDateRecord(data));
+    });
 
 export const Route = createFileRoute("/sarbatori")({
     head: () => ({
@@ -190,30 +193,45 @@ function RouteComponent() {
                             Configurare {holidayYear.year}
                         </h1>
                     </div>
-                    <form
-                        className="flex w-fit items-end gap-2"
-                        onSubmit={handleLoadYear}
-                    >
-                        <label className="grid gap-1 text-sm font-medium">
-                            An
-                            <input
-                                className="w-28 rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
-                                min={1}
-                                onChange={event =>
-                                    setYear(Number(event.target.value))
-                                }
-                                step={1}
-                                type="number"
-                                value={year}
-                            />
-                        </label>
-                        <button
-                            className="rounded-md border border-black bg-white px-4 py-2 font-bold text-black hover:bg-gray-100"
-                            type="submit"
+                    <div className="flex flex-wrap items-end gap-2">
+                        <Link
+                            className="inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-sm font-bold text-black hover:bg-gray-100"
+                            search={{
+                                year: holidayYear.year,
+                            }}
+                            to="/"
                         >
-                            Încarcă
-                        </button>
-                    </form>
+                            <CalendarDays
+                                aria-hidden="true"
+                                className="size-4"
+                            />
+                            Calendar
+                        </Link>
+                        <form
+                            className="flex w-fit items-end gap-2"
+                            onSubmit={handleLoadYear}
+                        >
+                            <label className="grid gap-1 text-sm font-medium">
+                                An
+                                <input
+                                    className="w-28 rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                                    min={1}
+                                    onChange={event =>
+                                        setYear(Number(event.target.value))
+                                    }
+                                    step={1}
+                                    type="number"
+                                    value={year}
+                                />
+                            </label>
+                            <button
+                                className="rounded-md border border-black bg-white px-4 py-2 font-bold text-black hover:bg-gray-100"
+                                type="submit"
+                            >
+                                Încarcă
+                            </button>
+                        </form>
+                    </div>
                 </header>
 
                 {missingHolidayNames.length > 0 ? (

@@ -1,6 +1,11 @@
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import {
+    Link,
+    createFileRoute,
+    redirect,
+    useRouter,
+} from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { Lock, LockOpen, Printer } from "lucide-react";
+import { CalendarDays, Lock, LockOpen, Printer } from "lucide-react";
 import { z } from "zod";
 import { ScheduleTable } from "@/components/schedule-table";
 import { TimesheetTable } from "@/components/timesheet-table";
@@ -37,34 +42,36 @@ const scheduleCellSchema = z.object({
 
 const getScheduleGroups = createServerFn({ method: "GET" })
     .validator(scheduleGroupsSchema)
-    .handler(({ data }) => unwrapServerResult(getMonthlySchedule(data)));
+    .handler(async ({ data }) => {
+        return unwrapServerResult(getMonthlySchedule(data));
+    });
 
 const generateSnapshot = createServerFn({ method: "POST" })
     .validator(scheduleGroupsSchema)
-    .handler(({ data }) =>
-        unwrapServerResult(
+    .handler(async ({ data }) => {
+        return unwrapServerResult(
             generateScheduleSnapshot(data),
             getGenerateSnapshotErrorMessage,
-        ),
-    );
+        );
+    });
 
 const invalidateSnapshot = createServerFn({ method: "POST" })
     .validator(scheduleGroupsSchema)
-    .handler(({ data }) =>
-        unwrapServerResult(
+    .handler(async ({ data }) => {
+        return unwrapServerResult(
             invalidateScheduleSnapshot(data),
             getInvalidateSnapshotErrorMessage,
-        ),
-    );
+        );
+    });
 
 const saveScheduleCell = createServerFn({ method: "POST" })
     .validator(scheduleCellSchema)
-    .handler(({ data }) =>
-        unwrapServerResult(
+    .handler(async ({ data }) => {
+        return unwrapServerResult(
             saveScheduleCellRecord(data),
             getScheduleErrorMessage,
-        ),
-    );
+        );
+    });
 
 function getScheduleErrorMessage(error: { type: string }) {
     if (isMonthLockedError(error)) {
@@ -239,31 +246,46 @@ function RouteComponent() {
                             {monthLabel} {year}
                         </h1>
                     </div>
-                    {loadedScheduleData.isBlocked ? null : loadedScheduleData.isLocked ? (
-                        <button
+                    <div className="flex flex-wrap gap-2">
+                        <Link
                             className="inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
-                            onClick={handleInvalidateSnapshot}
-                            type="button"
+                            search={{
+                                year,
+                            }}
+                            to="/"
                         >
-                            <LockOpen
+                            <CalendarDays
                                 aria-hidden="true"
                                 className="size-4"
                             />
-                            Invalidează pontaj
-                        </button>
-                    ) : (
-                        <button
-                            className="inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
-                            onClick={handleGenerateSnapshot}
-                            type="button"
-                        >
-                            <Lock
-                                aria-hidden="true"
-                                className="size-4"
-                            />
-                            Generează pontaj
-                        </button>
-                    )}
+                            Calendar
+                        </Link>
+                        {loadedScheduleData.isBlocked ? null : loadedScheduleData.isLocked ? (
+                            <button
+                                className="inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
+                                onClick={handleInvalidateSnapshot}
+                                type="button"
+                            >
+                                <LockOpen
+                                    aria-hidden="true"
+                                    className="size-4"
+                                />
+                                Invalidează pontaj
+                            </button>
+                        ) : (
+                            <button
+                                className="inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
+                                onClick={handleGenerateSnapshot}
+                                type="button"
+                            >
+                                <Lock
+                                    aria-hidden="true"
+                                    className="size-4"
+                                />
+                                Generează pontaj
+                            </button>
+                        )}
+                    </div>
                 </header>
 
                 {loadedScheduleData.isBlocked ? (

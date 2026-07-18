@@ -1,13 +1,29 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { CalendarDays, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { z } from "zod";
+import { getScheduleSnapshotMonths } from "@/db";
+import { unwrapServerResult } from "@/lib/server-result";
 
 const homeSearchSchema = z.object({
     year: z.coerce.number().int().positive().optional(),
 });
 
+const snapshotMonthsSchema = z.object({
+    year: z.number().int().positive(),
+});
+
+const getSnapshotMonths = createServerFn({ method: "GET" })
+    .validator(snapshotMonthsSchema)
+    .handler(async ({ data }) => {
+        return unwrapServerResult(getScheduleSnapshotMonths(data.year));
+    });
+
 export const Route = createFileRoute("/")({
     validateSearch: homeSearchSchema,
+    loaderDeps: ({ search }) => ({
+        year: search.year ?? new Date().getFullYear(),
+    }),
     head: () => ({
         meta: [
             {
@@ -15,6 +31,12 @@ export const Route = createFileRoute("/")({
             },
         ],
     }),
+    loader: ({ deps }) =>
+        getSnapshotMonths({
+            data: {
+                year: deps.year,
+            },
+        }),
     component: RouteComponent,
 });
 
@@ -35,10 +57,17 @@ const monthNames = [
 
 function RouteComponent() {
     const search = Route.useSearch();
+    const snapshotMonths = Route.useLoaderData();
     const selectedYear = search.year ?? new Date().getFullYear();
+    const snapshotMonthIndexes = new Set(
+        snapshotMonths.map(snapshot => snapshot.monthIndex),
+    );
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonthIndex = currentDate.getMonth();
+    const nextMonthDate = new Date(currentYear, currentMonthIndex + 1, 1);
+    const nextMonthYear = nextMonthDate.getFullYear();
+    const nextMonthIndex = nextMonthDate.getMonth();
 
     return (
         <main className="min-h-screen p-2">
@@ -118,12 +147,19 @@ function RouteComponent() {
                             const isCurrentMonth =
                                 selectedYear === currentYear &&
                                 monthIndex === currentMonthIndex;
+                            const isNextMonth =
+                                selectedYear === nextMonthYear &&
+                                monthIndex === nextMonthIndex;
+                            const hasSnapshot =
+                                snapshotMonthIndexes.has(monthIndex);
 
                             return (
                                 <Link
                                     className={`flex min-h-28 flex-col justify-between rounded-md border p-4 text-black hover:bg-gray-100 ${
                                         isCurrentMonth
                                             ? "border-teal-700 bg-teal-50"
+                                            : isNextMonth
+                                              ? "border-teal-200 bg-[#f0fdfa]"
                                             : "border-gray-200 bg-white"
                                     }`}
                                     key={monthName}
@@ -136,9 +172,13 @@ function RouteComponent() {
                                     <span className="text-lg font-bold">
                                         {monthName}
                                     </span>
-                                    <span className="text-sm text-gray-600">
-                                        Luna {monthIndex + 1}
-                                    </span>
+                                    {hasSnapshot ? (
+                                        <span className="text-sm font-semibold text-teal-700">
+                                            Pontaj creat
+                                        </span>
+                                    ) : (
+                                        <span aria-hidden="true" />
+                                    )}
                                 </Link>
                             );
                         })}

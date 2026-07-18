@@ -34,6 +34,10 @@ export type SaveScheduleCell = SchedulePeriod & {
     value: "" | ScheduleCellCode;
 };
 
+export type ScheduleSnapshotMonth = {
+    monthIndex: number;
+};
+
 export type MonthLockedError = { type: "month_locked" };
 export type InvalidScheduleCellCodeError = {
     type: "invalid_schedule_cell_code";
@@ -313,6 +317,29 @@ export function getMonthlySchedule(
     period: SchedulePeriod,
 ): ResultAsync<MonthlyScheduleView, UnknownDbError> {
     return ResultAsync.fromPromise(_getMonthlySchedule(period), unknownDbError);
+}
+
+async function _getScheduleSnapshotMonths(year: number) {
+    const snapshots = await db
+        .select({
+            month: schema.scheduleSnapshots.month,
+        })
+        .from(schema.scheduleSnapshots)
+        .where(eq(schema.scheduleSnapshots.year, year))
+        .orderBy(asc(schema.scheduleSnapshots.month));
+
+    return snapshots.map(snapshot => ({
+        monthIndex: snapshot.month - 1,
+    }));
+}
+
+export function getScheduleSnapshotMonths(
+    year: number,
+): ResultAsync<Array<ScheduleSnapshotMonth>, UnknownDbError> {
+    return ResultAsync.fromPromise(
+        _getScheduleSnapshotMonths(year),
+        unknownDbError,
+    );
 }
 
 async function _generateSnapshot({ monthIndex, year }: SchedulePeriod) {

@@ -1,6 +1,8 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import AuthGate from "@/integrations/clerk/auth-gate";
+import HeaderUser from "@/integrations/clerk/header-user";
 import ClerkProvider from "@/integrations/clerk/provider";
 
 import appCss from "../styles.css?url";
@@ -38,9 +40,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <head>
                 <HeadContent />
             </head>
-            <body className="font-sans wrap-anywhere antialiased selection:bg-[rgba(79,184,178,0.24)]">
+            <body className="mt-4 font-sans wrap-anywhere antialiased selection:bg-[rgba(79,184,178,0.24)] print:mt-0">
                 <ClerkProvider>
-                    {children}
+                    <AuthGate>
+                        <div className="fixed top-2 right-2 z-50 print:hidden">
+                            <HeaderUser />
+                        </div>
+                        {children}
+                    </AuthGate>
                     <TanStackDevtools
                         config={{
                             position: "bottom-right",

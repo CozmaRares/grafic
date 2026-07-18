@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { CalendarDays } from "lucide-react";
 import { z } from "zod";
 import {
     addEmployee as addEmployeeRecord,
@@ -30,9 +31,9 @@ type FormStatus = {
     type: "error";
 } | null;
 
-const getEmployeeRows = createServerFn({ method: "GET" }).handler(() =>
-    unwrapServerResult(getEmployees()),
-);
+const getEmployeeRows = createServerFn({ method: "GET" }).handler(async () => {
+    return unwrapServerResult(getEmployees());
+});
 
 const addEmployee = createServerFn({ method: "POST" })
     .validator(addEmployeeSchema)
@@ -149,13 +150,25 @@ function RouteComponent() {
     return (
         <main className="min-h-screen p-2">
             <div className="mx-auto w-full max-w-4xl space-y-6">
-                <header className="flex flex-col gap-1">
-                    <p className="text-sm font-semibold tracking-wide uppercase">
-                        Angajați
-                    </p>
-                    <h1 className="text-2xl font-bold sm:text-3xl">
-                        Adaugă angajat
-                    </h1>
+                <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="flex flex-col gap-1">
+                        <p className="text-sm font-semibold tracking-wide uppercase">
+                            Angajați
+                        </p>
+                        <h1 className="text-2xl font-bold sm:text-3xl">
+                            Adaugă angajat
+                        </h1>
+                    </div>
+                    <Link
+                        className="inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
+                        to="/"
+                    >
+                        <CalendarDays
+                            aria-hidden="true"
+                            className="size-4"
+                        />
+                        Calendar
+                    </Link>
                 </header>
 
                 <form
