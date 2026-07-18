@@ -10,7 +10,7 @@ services:
     environment:
       DATABASE_URL: /data/dev.db
     volumes:
-      - ./server-data:/data
+      - ${GRAFIC_DATA_DIR:-./server-data}:/data
     command:
       - pnpm
       - run
@@ -30,13 +30,15 @@ services:
       - .env
     environment:
       DATABASE_URL: /data/dev.db
-    ports:
-      - "3000:3000"
     volumes:
-      - ./server-data:/data
+      - ${GRAFIC_DATA_DIR:-./server-data}:/data
     depends_on:
       migrate:
         condition: service_completed_successfully
+    networks:
+      reverse-proxy:
+        aliases:
+          - grafic
     logging:
       driver: json-file
       options:
@@ -46,3 +48,7 @@ services:
 secrets:
   env:
     file: .env
+
+networks:
+  reverse-proxy:
+    external: true
