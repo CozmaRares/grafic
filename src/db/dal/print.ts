@@ -85,8 +85,9 @@ async function _getPrintSettings(): Promise<PrintSettings> {
     );
 
     return {
+        headAssistantName: settingsByKey.get("headAssistantName") ?? "",
         managerName: settingsByKey.get("managerName") ?? "",
-        preparedByName: settingsByKey.get("preparedByName") ?? "",
+        medicalDirectorName: settingsByKey.get("medicalDirectorName") ?? "",
         sectionChiefName: settingsByKey.get("sectionChiefName") ?? "",
     };
 }

@@ -43,8 +43,12 @@ const printSettingPrompts = [
         message: "Nume șef secție",
     },
     {
-        key: "preparedByName",
-        message: "Nume întocmit de",
+        key: "medicalDirectorName",
+        message: "Nume director medical",
+    },
+    {
+        key: "headAssistantName",
+        message: "Nume asistent șef",
     },
 ] as const;
 

@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { CalendarDays, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { z } from "zod";
 import { getScheduleSnapshotMonths } from "@/db";
+import HeaderUser from "@/integrations/clerk/header-user";
 import { unwrapServerResult } from "@/lib/server-result";
 
 const homeSearchSchema = z.object({
@@ -70,7 +71,10 @@ function RouteComponent() {
     const nextMonthIndex = nextMonthDate.getMonth();
 
     return (
-        <main className="min-h-screen p-2">
+        <main className="mt-4 min-h-screen p-2">
+            <div className="fixed top-2 right-2 z-50 print:hidden">
+                <HeaderUser />
+            </div>
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div className="flex flex-col gap-1">
@@ -96,16 +100,19 @@ function RouteComponent() {
                             />
                             Angajați
                         </Link>
-                        <a
+                        <Link
                             className="inline-flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-sm font-bold text-black hover:bg-gray-100"
-                            href={`/sarbatori?year=${selectedYear}`}
+                            search={{
+                                year: selectedYear,
+                            }}
+                            to="/sarbatori"
                         >
                             <CalendarDays
                                 aria-hidden="true"
                                 className="size-4"
                             />
                             Sărbători
-                        </a>
+                        </Link>
                     </nav>
                 </header>
 

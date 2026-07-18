@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { ScheduleTable } from "@/components/schedule-table";
@@ -135,12 +135,16 @@ function RouteComponent() {
 
     return (
         <>
-            <a
+            <Link
                 className="m-4 inline-flex w-fit items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100 print:hidden"
-                href={`/${year}/${monthIndex + 1}`}
+                params={{
+                    an: String(year),
+                    luna: String(monthIndex + 1),
+                }}
+                to="/$an/$luna"
             >
                 Inapoi
-            </a>
+            </Link>
 
             <div className="space-y-4 p-8 print:flex print:min-h-screen print:flex-col print:justify-center print:space-y-4">
                 {printSchedule.kind === "timesheet" ? (
@@ -162,6 +166,9 @@ function RouteComponent() {
                             year={year}
                         />
                         <TimesheetPrintFooter
+                            compartment={
+                                printSchedule.timesheetGroup.compartment
+                            }
                             printSettings={printSchedule.printSettings}
                         />
                     </>
@@ -193,6 +200,7 @@ function RouteComponent() {
                             year={year}
                         />
                         <PrintFooter
+                            compartment={printSchedule.group.compartment}
                             printSettings={printSchedule.printSettings}
                         />
                     </>
@@ -236,16 +244,24 @@ function PrintHeader({
     );
 }
 
-function PrintFooter({ printSettings }: { printSettings: PrintSettings }) {
+function PrintFooter({
+    compartment,
+    printSettings,
+}: {
+    compartment: Compartment;
+    printSettings: PrintSettings;
+}) {
+    const authority = getPrintAuthority(compartment, printSettings);
+
     return (
         <div className="flex justify-between px-4 font-bold">
             <div className="text-center">
-                <p>ȘEF SECȚIE,</p>
-                <p>{printSettings.sectionChiefName}</p>
+                <p>{authority.label},</p>
+                <p>{authority.name}</p>
             </div>
             <div className="text-center">
                 <p>ÎNTOCMIT,</p>
-                <p>{printSettings.preparedByName}</p>
+                <p>{printSettings.headAssistantName}</p>
             </div>
         </div>
     );
@@ -312,10 +328,14 @@ function TimesheetPrintHeader({
 }
 
 function TimesheetPrintFooter({
+    compartment,
     printSettings,
 }: {
+    compartment: Compartment;
     printSettings: PrintSettings;
 }) {
+    const authority = getPrintAuthority(compartment, printSettings);
+
     return (
         <div className="grid grid-cols-3 px-4 font-bold">
             <div className="text-center">
@@ -323,13 +343,28 @@ function TimesheetPrintFooter({
                 <p>{printSettings.managerName}</p>
             </div>
             <div className="text-center">
-                <p>ȘEF SECȚIE,</p>
-                <p>{printSettings.sectionChiefName}</p>
+                <p>{authority.label},</p>
+                <p>{authority.name}</p>
             </div>
             <div className="text-center">
                 <p>ÎNTOCMIT,</p>
-                <p>{printSettings.preparedByName}</p>
+                <p>{printSettings.headAssistantName}</p>
             </div>
         </div>
     );
+}
+
+function getPrintAuthority(
+    compartment: Compartment,
+    printSettings: PrintSettings,
+) {
+    return compartment === "medici_garda"
+        ? {
+              label: "DIRECTOR MEDICAL",
+              name: printSettings.medicalDirectorName,
+          }
+        : {
+              label: "ȘEF SECȚIE",
+              name: printSettings.sectionChiefName,
+          };
 }

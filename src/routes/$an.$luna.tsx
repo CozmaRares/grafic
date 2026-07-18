@@ -305,12 +305,15 @@ function RouteComponent() {
                                 ),
                             )}
                         </ul>
-                        <a
+                        <Link
                             className="inline-flex w-fit items-center rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
-                            href={`/sarbatori?year=${loadedScheduleData.year}`}
+                            search={{
+                                year: loadedScheduleData.year,
+                            }}
+                            to="/sarbatori"
                         >
                             Setează sărbători
-                        </a>
+                        </Link>
                     </section>
                 ) : loadedScheduleData.isLocked ? (
                     loadedScheduleData.timesheetGroups.map(group => (
@@ -322,16 +325,21 @@ function RouteComponent() {
                                 <h2 className="text-lg font-bold">
                                     {group.title}
                                 </h2>
-                                <a
+                                <Link
                                     className="inline-flex items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
-                                    href={`/${year}/${monthIndex + 1}/print/${group.printSlug}`}
+                                    params={{
+                                        an: String(year),
+                                        luna: String(monthIndex + 1),
+                                        printSlug: group.printSlug,
+                                    }}
+                                    to="/$an/$luna/print/$printSlug"
                                 >
                                     <Printer
                                         aria-hidden="true"
                                         className="size-4"
                                     />
                                     Print
-                                </a>
+                                </Link>
                             </div>
                             <TimesheetTable
                                 holidayDateKeys={group.holidayDateKeys}
@@ -358,16 +366,21 @@ function RouteComponent() {
                                       {group.title}
                                   </h2>
                                   {group.showHourTotals === false ? null : (
-                                      <a
+                                      <Link
                                           className="inline-flex items-center gap-2 rounded-md border border-black bg-white px-4 py-1.5 text-sm font-bold text-black hover:bg-gray-100"
-                                          href={`/${year}/${monthIndex + 1}/print/${group.printSlug}`}
+                                          params={{
+                                              an: String(year),
+                                              luna: String(monthIndex + 1),
+                                              printSlug: group.printSlug,
+                                          }}
+                                          to="/$an/$luna/print/$printSlug"
                                       >
                                           <Printer
                                               aria-hidden="true"
                                               className="size-4"
                                           />
                                           Print
-                                      </a>
+                                      </Link>
                                   )}
                               </div>
                               <ScheduleTable

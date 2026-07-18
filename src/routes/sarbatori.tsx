@@ -14,6 +14,10 @@ const yearSchema = z.object({
     year: z.number().int().positive(),
 });
 
+const holidaySearchSchema = z.object({
+    year: z.coerce.number().int().positive().optional(),
+});
+
 const variableHolidayDateSchema = z.object({
     day: z.coerce
         .number("Completează ziua.")
@@ -52,6 +56,10 @@ const saveVariableLegalHolidayDate = createServerFn({ method: "POST" })
     });
 
 export const Route = createFileRoute("/sarbatori")({
+    validateSearch: holidaySearchSchema,
+    loaderDeps: ({ search }) => ({
+        year: search.year ?? new Date().getFullYear(),
+    }),
     head: () => ({
         meta: [
             {
@@ -59,33 +67,18 @@ export const Route = createFileRoute("/sarbatori")({
             },
         ],
     }),
-    loader: () =>
+    loader: ({ deps }) =>
         getHolidayYear({
             data: {
-                year: getInitialYear(),
+                year: deps.year,
             },
         }),
     component: RouteComponent,
 });
 
-function getInitialYear() {
-    const fallbackYear = new Date().getFullYear();
-
-    if (typeof globalThis.location === "undefined") {
-        return fallbackYear;
-    }
-
-    const parsedYear = Number(
-        new URLSearchParams(globalThis.location.search).get("year"),
-    );
-
-    return Number.isInteger(parsedYear) && parsedYear > 0
-        ? parsedYear
-        : fallbackYear;
-}
-
 function RouteComponent() {
     const initialHolidayYear = Route.useLoaderData();
+    const navigate = Route.useNavigate();
     const getHolidayYearFn = useServerFn(getHolidayYear);
     const saveVariableLegalHolidayDateFn = useServerFn(
         saveVariableLegalHolidayDate,
@@ -113,7 +106,7 @@ function RouteComponent() {
         [holidayYear],
     );
 
-    async function handleLoadYear(event: React.FormEvent<HTMLFormElement>) {
+    async function handleLoadYear(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         setStatus(null);
 
@@ -124,11 +117,13 @@ function RouteComponent() {
                 },
             });
             setHolidayYear(nextHolidayYear);
-            globalThis.history.replaceState(
-                null,
-                "",
-                `/sarbatori?year=${year}`,
-            );
+            await navigate({
+                replace: true,
+                search: {
+                    year,
+                },
+                to: "/sarbatori",
+            });
         } catch (error) {
             setStatus({
                 message:
@@ -211,10 +206,9 @@ function RouteComponent() {
                             className="flex w-fit items-end gap-2"
                             onSubmit={handleLoadYear}
                         >
-                            <label className="grid gap-1 text-sm font-medium">
-                                An
+                            <label className="relative text-sm font-medium before:absolute before:top-1/2 before:left-4 before:-translate-y-1/2 before:font-bold before:text-black before:content-['An']">
                                 <input
-                                    className="w-28 rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                                    className="h-10 w-28 rounded-md border border-black bg-white py-2 pr-4 pl-11 font-bold text-black outline-none hover:bg-gray-100 focus:bg-white focus:ring-2 focus:ring-teal-100"
                                     min={1}
                                     onChange={event =>
                                         setYear(Number(event.target.value))
@@ -290,7 +284,7 @@ function RouteComponent() {
                                             </td>
                                             <td className="px-3 py-2">
                                                 <input
-                                                    className="w-24 rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                                                    className="h-9 w-24 rounded-md border border-black bg-white px-3 py-1.5 font-bold text-black outline-none hover:bg-gray-100 focus:bg-white focus:ring-2 focus:ring-teal-100"
                                                     max={31}
                                                     min={1}
                                                     onChange={event =>
@@ -312,7 +306,7 @@ function RouteComponent() {
                                             </td>
                                             <td className="px-3 py-2">
                                                 <input
-                                                    className="w-24 rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                                                    className="h-9 w-24 rounded-md border border-black bg-white px-3 py-1.5 font-bold text-black outline-none hover:bg-gray-100 focus:bg-white focus:ring-2 focus:ring-teal-100"
                                                     max={12}
                                                     min={1}
                                                     onChange={event =>

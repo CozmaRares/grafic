@@ -75,8 +75,9 @@ export type MonthlyScheduleView =
       };
 
 export type PrintSettings = {
+    headAssistantName: string;
     managerName: string;
-    preparedByName: string;
+    medicalDirectorName: string;
     sectionChiefName: string;
 };
 

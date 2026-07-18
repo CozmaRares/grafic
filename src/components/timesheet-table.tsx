@@ -346,5 +346,5 @@ export function TimesheetTable({
 }
 
 function getTimesheetFunctionLabel(functie: EmployeeFunction) {
-    return functie === "medic garda" ? "Medic" : functie;
+    return functie === "Medic Garda" ? "Medic" : functie;
 }

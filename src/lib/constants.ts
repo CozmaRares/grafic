@@ -5,11 +5,11 @@ export type NotatieGrafic = {
 
 export const EMPLOYEE_FUNCTIONS = [
     "Medic",
-    "medic garda",
-    "As. medical",
+    "Medic Gardă",
+    "As. Medical",
     "As. Șef",
     "Infirmier",
-    "Ingr. curățenie",
+    "Îngr. Curățenie",
 ] as const;
 
 export type EmployeeFunction = (typeof EMPLOYEE_FUNCTIONS)[number];
@@ -96,7 +96,7 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
         workedHours: 16,
         interval: {
             startHour: 16,
-            endHour: 8,
+            endHour: 6,
         },
     },
     "17": {
@@ -144,7 +144,7 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
     N: {
         workedHours: 12,
         intervalByFunction: {
-            "As. medical": {
+            "As. Medical": {
                 startHour: 19,
                 endHour: 7,
             },
@@ -156,7 +156,7 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
                 startHour: 18,
                 endHour: 6,
             },
-            "Ingr. curățenie": {
+            "Îngr. Curățenie": {
                 startHour: 18,
                 endHour: 6,
             },
@@ -297,7 +297,7 @@ export const SCHEDULE_GROUPS: ReadonlyArray<ScheduleGroup> = [
         groupOrder: 2,
         printSlug: "asistenti",
         functions: [
-            ["As. medical", 0],
+            ["As. Medical", 0],
             ["As. Șef", 0],
         ],
         scheduleCellCodes: DEFAULT_SCHEDULE_CELL_CODES,
@@ -310,7 +310,7 @@ export const SCHEDULE_GROUPS: ReadonlyArray<ScheduleGroup> = [
         printSlug: "infirmieri-ingrijitori",
         functions: [
             ["Infirmier", 1],
-            ["Ingr. curățenie", 0],
+            ["Îngr. Curățenie", 0],
         ],
         scheduleCellCodes: DEFAULT_SCHEDULE_CELL_CODES,
         compartment: "pneumoftiziologie",
@@ -328,7 +328,7 @@ export const SCHEDULE_GROUPS: ReadonlyArray<ScheduleGroup> = [
     {
         groupOrder: 0,
         printSlug: "medici-garda",
-        functions: [["medic garda", 0]],
+        functions: [["Medic Gardă", 0]],
         scheduleCellCodes: DOCTOR_ON_CALL_SCHEDULE_CELL_CODES,
         compartment: "medici_garda",
         title: "Medici de gardă",
