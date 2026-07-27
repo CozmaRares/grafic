@@ -215,12 +215,16 @@ export function ScheduleTable({
     );
     const [editingCell, setEditingCell] = useState<CellPosition | null>(null);
     const [draftValue, setDraftValue] = useState("");
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const editingCellRef = useRef<CellPosition | null>(null);
+    const draftValueRef = useRef("");
     const inputRef = useRef<HTMLInputElement>(null);
     const cellRefs = useRef(new Map<string, HTMLButtonElement>());
 
     useEffect(() => {
         setRows(initialRows);
         setEditingCell(null);
+        editingCellRef.current = null;
     }, [initialRows]);
 
     useEffect(() => {
@@ -288,48 +292,77 @@ export function ScheduleTable({
     );
 
     const commitCell = useCallback(
-        async (nextCell?: CellPosition | null) => {
-            if (!editingCell) {
+        () => {
+            const currentEditingCell = editingCellRef.current;
+
+            if (!currentEditingCell) {
                 return;
             }
 
-            const row = rows[editingCell.rowIndex];
-            const value = normalizeNotation(draftValue, scheduleCellCodes);
+            const row = rows[currentEditingCell.rowIndex];
+            const value = normalizeNotation(
+                draftValueRef.current,
+                scheduleCellCodes,
+            );
+            const previousValue = row.values[currentEditingCell.day] ?? "";
+
+            editingCellRef.current = null;
+            setEditingCell(null);
+
+            if (value === previousValue) {
+                return;
+            }
 
             setRows(currentRows =>
                 currentRows.map((currentRow, rowIndex) =>
-                    rowIndex === editingCell.rowIndex
+                    rowIndex === currentEditingCell.rowIndex
                         ? {
                               ...currentRow,
                               values: {
                                   ...currentRow.values,
-                                  [editingCell.day]: value,
+                                  [currentEditingCell.day]: value,
                               },
                           }
                         : currentRow,
                 ),
             );
-            setEditingCell(null);
+            setSaveError(null);
 
             if (saveScheduleCell) {
-                await saveScheduleCell({
+                void saveScheduleCell({
                     employeeId: row.id,
                     year,
                     monthIndex,
-                    day: editingCell.day,
+                    day: currentEditingCell.day,
                     compartment,
                     value,
+                }).catch(error => {
+                    setRows(currentRows =>
+                        currentRows.map(currentRow =>
+                            currentRow.id === row.id &&
+                            (currentRow.values[currentEditingCell.day] ??
+                                "") === value
+                                ? {
+                                      ...currentRow,
+                                      values: {
+                                          ...currentRow.values,
+                                          [currentEditingCell.day]:
+                                              previousValue,
+                                      },
+                                  }
+                                : currentRow,
+                        ),
+                    );
+                    setSaveError(
+                        error instanceof Error
+                            ? error.message
+                            : "Celula nu a putut fi salvată.",
+                    );
                 });
-            }
-
-            if (nextCell) {
-                focusCell(nextCell);
             }
         },
         [
-            draftValue,
-            editingCell,
-            focusCell,
+            compartment,
             monthIndex,
             rows,
             scheduleCellCodes,
@@ -339,15 +372,25 @@ export function ScheduleTable({
     );
 
     const cancelCell = useCallback(() => {
+        const currentEditingCell = editingCellRef.current;
+
+        editingCellRef.current = null;
         setEditingCell(null);
-        if (editingCell) {
-            focusCell(editingCell);
+        if (currentEditingCell) {
+            focusCell(currentEditingCell);
         }
-    }, [editingCell, focusCell]);
+    }, [focusCell]);
 
     function startEditing(position: CellPosition, value: string) {
+        editingCellRef.current = position;
+        draftValueRef.current = value;
         setDraftValue(value);
         setEditingCell(position);
+    }
+
+    function updateDraftValue(value: string) {
+        draftValueRef.current = value;
+        setDraftValue(value);
     }
 
     function handleCellKeyDown(
@@ -372,21 +415,27 @@ export function ScheduleTable({
 
         if (direction) {
             event.preventDefault();
-            return commitCell(getNextCell(currentCell, direction));
+            const nextCell = getNextCell(currentCell, direction);
+
+            if (nextCell) {
+                focusCell(nextCell);
+            }
+
+            return;
         }
 
         if (event.key === "Enter") {
             event.preventDefault();
-            return commitCell(
-                getNextCell(currentCell, event.shiftKey ? "up" : "down"),
+            const nextCell = getNextCell(
+                currentCell,
+                event.shiftKey ? "up" : "down",
             );
-        }
 
-        if (event.key === "Tab") {
-            event.preventDefault();
-            return commitCell(
-                getNextCell(currentCell, event.shiftKey ? "left" : "right"),
-            );
+            if (nextCell) {
+                focusCell(nextCell);
+            }
+
+            return;
         }
     }
 
@@ -557,7 +606,7 @@ export function ScheduleTable({
                                                             commitCell()
                                                         }
                                                         onChange={event =>
-                                                            setDraftValue(
+                                                            updateDraftValue(
                                                                 event.target
                                                                     .value,
                                                             )
@@ -651,6 +700,14 @@ export function ScheduleTable({
                     </tbody>
                 </table>
             </div>
+            {saveError ? (
+                <p
+                    className="text-sm font-medium text-red-700"
+                    role="status"
+                >
+                    {saveError}
+                </p>
+            ) : null}
         </section>
     );
 }

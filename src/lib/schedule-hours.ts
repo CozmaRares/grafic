@@ -128,18 +128,13 @@ function calculateDoubleWorkedHours({
             segmentStart.getDate() + 1,
         );
         const segmentEnd = nextMidnight < end ? nextMidnight : end;
-        const segmentDateKey = getDateKey(
-            segmentStart.getFullYear(),
-            segmentStart.getMonth(),
-            segmentStart.getDate(),
-        );
-
-        const isCurrentMonthSegment =
-            segmentStart.getFullYear() === year &&
-            segmentStart.getMonth() === monthIndex;
-        const isDoubleSegment = isCurrentMonthSegment
-            ? doubleDateKeys.has(segmentDateKey)
-            : (isLegalHoliday?.(segmentStart) ?? false);
+        const isDoubleSegment =
+            isDoubleHoursDate(
+                segmentStart.getFullYear(),
+                segmentStart.getMonth(),
+                segmentStart.getDate(),
+                doubleDateKeys,
+            ) || (isLegalHoliday?.(segmentStart) ?? false);
 
         if (isDoubleSegment) {
             doubleIntervalHours +=
