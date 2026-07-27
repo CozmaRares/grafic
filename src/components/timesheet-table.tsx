@@ -338,7 +338,7 @@ export function TimesheetTable({
                                         {nightShiftCount >= 3 ? "T" : ""}
                                     </td>
                                     <td className="border border-black px-1 py-0.5 text-center tabular-nums">
-                                        {totalNonWorkedHours || ""}
+                                        {totalNonWorkedHours}
                                     </td>
                                     {summaryCodes.map(code => (
                                         <td
