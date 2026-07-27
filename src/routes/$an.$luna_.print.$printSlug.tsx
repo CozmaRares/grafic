@@ -295,7 +295,7 @@ function TimesheetPrintHeader({
                     >
                         8
                     </span>{" "}
-                    - tură I
+                    - tura I
                 </p>
                 <p>
                     <span
@@ -303,7 +303,7 @@ function TimesheetPrintHeader({
                     >
                         4
                     </span>{" "}
-                    - tură II
+                    - tura II
                 </p>
                 <p>
                     <span
@@ -311,7 +311,7 @@ function TimesheetPrintHeader({
                     >
                         8
                     </span>{" "}
-                    - tură III
+                    - tura III
                 </p>
             </div>
             <div>
