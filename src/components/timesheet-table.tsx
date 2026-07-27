@@ -131,18 +131,19 @@ export function TimesheetTable({
             <div className="w-full overflow-hidden">
                 <table className="w-full table-fixed border-collapse text-sm font-bold whitespace-nowrap">
                     <colgroup>
-                        <col className="w-20" />
+                        <col className="w-18" />
                         <col className="w-40" />
                         <col className="w-28" />
                         {allDays.map(day => (
                             <col key={day} />
                         ))}
-                        <col className="w-16" />
+                        <col className="w-20" />
                         <col className="w-16" />
                         <col className="w-12" />
+                        <col className="w-20" />
                         {summaryCodes.map(code => (
                             <col
-                                className="w-12"
+                                className="w-10"
                                 key={code}
                             />
                         ))}
@@ -179,7 +180,8 @@ export function TimesheetTable({
                                 className="border border-black px-1 py-0.5 text-center whitespace-normal"
                                 rowSpan={2}
                             >
-                                Total Ore
+                                <p className="whitespace-nowrap">Total Ore</p>
+                                <p className="whitespace-nowrap">Lucrate</p>
                             </th>
                             <th
                                 className="border border-black px-1 py-0.5 text-center whitespace-normal"
@@ -191,7 +193,14 @@ export function TimesheetTable({
                                 className="border border-black px-1 py-0.5 text-center"
                                 rowSpan={2}
                             >
-                                Tura
+                                Tură
+                            </th>
+                            <th
+                                className="border border-black px-1 py-0.5 text-center whitespace-normal"
+                                rowSpan={2}
+                            >
+                                <p className="whitespace-nowrap">Total Ore</p>
+                                <p className="whitespace-nowrap">Nelucrate</p>
                             </th>
                             {summaryCodes.map(code => (
                                 <th
@@ -235,9 +244,8 @@ export function TimesheetTable({
                                     : INACTIVE_DAY_MARKER,
                             );
                             const validValues = values.slice(0, daysInMonth);
-                            const totalHours = validValues.reduce(
-                                (total, value, index) =>
-                                    total +
+                            const dailyHours = validValues.map(
+                                (value, index) =>
                                     calculateScheduleHours({
                                         day: index + 1,
                                         doubleDateKeys: doubleDateKeySet,
@@ -246,21 +254,23 @@ export function TimesheetTable({
                                         functie: row.functie,
                                         shiftCode: value,
                                         year,
-                                    }).effectiveHours,
+                                    }),
+                            );
+                            const totalHours = dailyHours.reduce(
+                                (total, hours) => total + hours.effectiveHours,
                                 0,
                             );
-                            const doubleHours = validValues.reduce(
-                                (total, value, index) =>
+                            const doubleHours = dailyHours.reduce(
+                                (total, hours) =>
+                                    total + hours.doubleWorkedHours,
+                                0,
+                            );
+                            const totalNonWorkedHours = dailyHours.reduce(
+                                (total, hours) =>
                                     total +
-                                    calculateScheduleHours({
-                                        day: index + 1,
-                                        doubleDateKeys: doubleDateKeySet,
-                                        isLegalHoliday,
-                                        monthIndex,
-                                        functie: row.functie,
-                                        shiftCode: value,
-                                        year,
-                                    }).doubleWorkedHours,
+                                    (hours.effectiveHours === 0
+                                        ? hours.workedHours
+                                        : 0),
                                 0,
                             );
                             const nightShiftCount = validValues.filter(
@@ -326,6 +336,9 @@ export function TimesheetTable({
                                     </td>
                                     <td className="border border-black px-1 py-0.5 text-center">
                                         {nightShiftCount >= 3 ? "T" : ""}
+                                    </td>
+                                    <td className="border border-black px-1 py-0.5 text-center tabular-nums">
+                                        {totalNonWorkedHours || ""}
                                     </td>
                                     {summaryCodes.map(code => (
                                         <td
