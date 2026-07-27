@@ -96,7 +96,7 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
         workedHours: 16,
         interval: {
             startHour: 16,
-            endHour: 6,
+            endHour: 8,
         },
     },
     "17": {
@@ -117,7 +117,7 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
         workedHours: 23,
         interval: {
             startHour: 8,
-            endHour: 7,
+            endHour: 8,
         },
     },
     "24": {
