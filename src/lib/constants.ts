@@ -46,7 +46,7 @@ export type Compartment = (typeof COMPARTMENTS)[number];
 
 export const COMPARTMENT_LABELS: Record<Compartment, string> = {
     medici_garda: "MEDICI-GARDĂ",
-    pneumoftiziologie: "PNEUMOFTIZIOLOGIE",
+    pneumoftiziologie: "PNEUMOLOGIE",
 };
 
 type ShiftInterval = {
@@ -192,7 +192,7 @@ export const COLORS = {
     tura1: "text-blue-700",
     tura2: "text-black",
     tura3: "text-green-700",
-    placeholder: "text-gray-400",
+    placeholder: "text-gray-700",
 };
 
 export const TIMESHEET_NOTATION_LABELS = {

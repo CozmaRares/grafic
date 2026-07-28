@@ -4,6 +4,7 @@ import {
     redirect,
     useRouter,
 } from "@tanstack/react-router";
+import { useAuth } from "@clerk/tanstack-react-start";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { CalendarDays, Lock, LockOpen, Printer } from "lucide-react";
 import { z } from "zod";
@@ -201,18 +202,52 @@ function RouteComponent() {
         scheduleGroups: loadedScheduleData,
         year,
     } = Route.useLoaderData();
+    const { getToken } = useAuth();
     const saveScheduleCellFn = useServerFn(saveScheduleCell);
     const generateSnapshotFn = useServerFn(generateSnapshot);
     const invalidateSnapshotFn = useServerFn(invalidateSnapshot);
     const router = useRouter();
 
-    async function handleGenerateSnapshot() {
-        await generateSnapshotFn({
-            data: {
-                monthIndex,
-                year,
-            },
+    async function getAuthHeaders(forceRefresh = false) {
+        const token = await getToken({
+            skipCache: forceRefresh,
         });
+
+        return token ? { Authorization: `Bearer ${token}` } : undefined;
+    }
+
+    async function callWithAuthRetry<T>(
+        callServerFn: (headers?: HeadersInit) => Promise<T>,
+    ) {
+        const headers = await getAuthHeaders();
+
+        try {
+            return await callServerFn(headers);
+        } catch (error) {
+            if (!isUnauthorizedError(error)) {
+                throw error;
+            }
+
+            const refreshedHeaders = await getAuthHeaders(true);
+
+            if (!refreshedHeaders) {
+                throw error;
+            }
+
+            return callServerFn(refreshedHeaders);
+        }
+    }
+
+    async function handleGenerateSnapshot() {
+        await callWithAuthRetry(headers =>
+            generateSnapshotFn({
+                data: {
+                    monthIndex,
+                    year,
+                },
+                headers,
+            }),
+        );
         await router.invalidate();
     }
 
@@ -225,12 +260,15 @@ function RouteComponent() {
             return;
         }
 
-        await invalidateSnapshotFn({
-            data: {
-                monthIndex,
-                year,
-            },
-        });
+        await callWithAuthRetry(headers =>
+            invalidateSnapshotFn({
+                data: {
+                    monthIndex,
+                    year,
+                },
+                headers,
+            }),
+        );
         await router.invalidate();
     }
 
@@ -399,9 +437,12 @@ function RouteComponent() {
                                       loadedScheduleData.isLocked
                                           ? undefined
                                           : params =>
-                                                saveScheduleCellFn({
-                                                    data: params,
-                                                })
+                                                callWithAuthRetry(headers =>
+                                                    saveScheduleCellFn({
+                                                        data: params,
+                                                        headers,
+                                                    }),
+                                                )
                                   }
                                   year={year}
                               />
@@ -410,4 +451,8 @@ function RouteComponent() {
             </div>
         </main>
     );
+}
+
+function isUnauthorizedError(error: unknown) {
+    return error instanceof Error && error.message === "Unauthorized";
 }
