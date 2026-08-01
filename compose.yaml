@@ -19,7 +19,7 @@ services:
         max-size: "5m"
         max-file: "3"
 
-  grafic:
+  server:
     build:
       context: .
       secrets:
