@@ -228,25 +228,27 @@ export const NOTATII_GRAFIC = {
     "=": { color: COLORS.placeholder, type: "normal" },
 } as const satisfies Record<ScheduleCellCode, NotatieGrafic>;
 
-export const DEFAULT_SCHEDULE_CELL_CODES = [
-    "Z",
-    "N",
+const NON_WORKING_CELL_CODES = [
     "C",
-    "=",
-    "1",
     "B",
     "CE",
     "CF",
     "ZS",
+    "=",
+] as const satisfies ReadonlyArray<ScheduleCellCode>;
+
+export const DEFAULT_SCHEDULE_CELL_CODES = [
+    "Z",
+    "N",
+    "C",
+    "1",
+    ...NON_WORKING_CELL_CODES,
 ] as const satisfies ReadonlyArray<ScheduleCellCode>;
 
 export const DOCTOR_SCHEDULE_CELL_CODES = [
     "7",
     "C",
-    "B",
-    "CE",
-    "CF",
-    "ZS",
+    ...NON_WORKING_CELL_CODES,
 ] as const satisfies ReadonlyArray<ScheduleCellCode>;
 
 export const DOCTOR_ON_CALL_SCHEDULE_CELL_CODES = [
@@ -255,15 +257,13 @@ export const DOCTOR_ON_CALL_SCHEDULE_CELL_CODES = [
     "18",
     "23",
     "24",
-    "B",
-    "C",
-    "CE",
-    "CF",
-    "ZS",
+    ...NON_WORKING_CELL_CODES,
 ] as const satisfies ReadonlyArray<ScheduleCellCode>;
 
 export const MEDICAL_REGISTRATION_SCHEDULE_CELL_CODES = [
     "1",
+    "B",
+    ...NON_WORKING_CELL_CODES,
 ] as const satisfies ReadonlyArray<ScheduleCellCode>;
 
 export type ScheduleGroup = {

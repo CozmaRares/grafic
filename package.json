@@ -1,6 +1,7 @@
 {
     "name": "grafic",
     "private": true,
+    "packageManager": "pnpm@11.23.0",
     "type": "module",
     "imports": {
         "@/*": "./src/*"
