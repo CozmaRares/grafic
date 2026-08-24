@@ -10,6 +10,7 @@ export const EMPLOYEE_FUNCTIONS = [
     "As. Șef",
     "Infirmier",
     "Îngr. Curățenie",
+    "Registrator Medical",
 ] as const;
 
 export type EmployeeFunction = (typeof EMPLOYEE_FUNCTIONS)[number];
@@ -261,6 +262,10 @@ export const DOCTOR_ON_CALL_SCHEDULE_CELL_CODES = [
     "ZS",
 ] as const satisfies ReadonlyArray<ScheduleCellCode>;
 
+export const MEDICAL_REGISTRATION_SCHEDULE_CELL_CODES = [
+    "1",
+] as const satisfies ReadonlyArray<ScheduleCellCode>;
+
 export type ScheduleGroup = {
     expectedDailyShiftCount?: number;
     groupOrder: number;
@@ -293,6 +298,15 @@ export const TIMESHEET_GROUPS: ReadonlyArray<TimesheetGroup> = [
 
 export const SCHEDULE_GROUPS: ReadonlyArray<ScheduleGroup> = [
     {
+        groupOrder: 1,
+        printSlug: "medici",
+        functions: [["Medic", 0]],
+        scheduleCellCodes: DOCTOR_SCHEDULE_CELL_CODES,
+        compartment: "pneumoftiziologie",
+        title: "Medici",
+        showHourTotals: false,
+    },
+    {
         expectedDailyShiftCount: 3,
         groupOrder: 2,
         printSlug: "asistenti",
@@ -317,13 +331,12 @@ export const SCHEDULE_GROUPS: ReadonlyArray<ScheduleGroup> = [
         title: "Infirmieri și îngrijitori",
     },
     {
-        groupOrder: 1,
-        printSlug: "medici",
-        functions: [["Medic", 0]],
-        scheduleCellCodes: DOCTOR_SCHEDULE_CELL_CODES,
+        groupOrder: 4,
+        printSlug: "registratori-medicali",
+        functions: [["Registrator Medical", 0]],
+        scheduleCellCodes: MEDICAL_REGISTRATION_SCHEDULE_CELL_CODES,
         compartment: "pneumoftiziologie",
-        title: "Medici",
-        showHourTotals: false,
+        title: "Registratori medicali",
     },
     {
         groupOrder: 0,
