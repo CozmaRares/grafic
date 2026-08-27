@@ -1,50 +1,50 @@
 services:
-  migrate:
-    build:
-      context: .
-      target: build
-      secrets:
-        - env
-    env_file:
-      - .env
-    volumes:
-      - ${GRAFIC_DATA_DIR:?GRAFIC_DATA_DIR is required}:/data
-    command:
-      - pnpm
-      - run
-      - ${DRIZZLE_UDATE_DB_COMMAND}
-    logging:
-      driver: json-file
-      options:
-        max-size: "5m"
-        max-file: "3"
+    migrate:
+        build:
+            context: .
+            target: build
+            secrets:
+                - env
+        env_file:
+            - .env
+        volumes:
+            - ${GRAFIC_DATA_DIR:?GRAFIC_DATA_DIR is required}:/data
+        command:
+            - pnpm
+            - run
+            - ${DRIZZLE_UDATE_DB_COMMAND}
+        logging:
+            driver: json-file
+            options:
+                max-size: "5m"
+                max-file: "3"
 
-  server:
-    build:
-      context: .
-      secrets:
-        - env
-    env_file:
-      - .env
-    volumes:
-      - ${GRAFIC_DATA_DIR:?GRAFIC_DATA_DIR is required}:/data
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
-    networks:
-      reverse-proxy:
-        aliases:
-          - grafic
-    logging:
-      driver: json-file
-      options:
-        max-size: "20m"
-        max-file: "5"
+    server:
+        build:
+            context: .
+            secrets:
+                - env
+        env_file:
+            - .env
+        volumes:
+            - ${GRAFIC_DATA_DIR:?GRAFIC_DATA_DIR is required}:/data
+        depends_on:
+            migrate:
+                condition: service_completed_successfully
+        networks:
+            reverse-proxy:
+                aliases:
+                    - grafic
+        logging:
+            driver: json-file
+            options:
+                max-size: "20m"
+                max-file: "5"
 
 secrets:
-  env:
-    file: .env
+    env:
+        file: .env
 
 networks:
-  reverse-proxy:
-    external: true
+    reverse-proxy:
+        external: true

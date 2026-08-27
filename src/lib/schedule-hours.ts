@@ -22,6 +22,12 @@ type ShiftInterval = {
     startHour: number;
 };
 
+type ResolvedShiftDefinition = {
+    effectiveHours?: 0;
+    interval?: ShiftInterval;
+    workedHours: number;
+};
+
 export function getDateKey(year: number, monthIndex: number, day: number) {
     const date = new Date(year, monthIndex, day);
     const normalizedYear = date.getFullYear();
@@ -63,23 +69,29 @@ export function calculateScheduleHours({
     }
 
     const definition = SCHEDULE_SHIFT_DEFINITIONS[shiftCode];
-    const interval = getShiftInterval(definition, functie);
+    const resolvedDefinition = resolveShiftDefinition(definition, functie);
+
+    if (!resolvedDefinition) {
+        return emptyScheduleHours();
+    }
 
     return {
         doubleWorkedHours:
-            definition.effectiveHours ??
+            resolvedDefinition.effectiveHours ??
             calculateDoubleWorkedHours({
                 day,
                 doubleDateKeys,
-                interval,
+                interval: resolvedDefinition.interval,
                 isLegalHoliday,
                 monthIndex,
-                workedHours: definition.workedHours,
+                workedHours: resolvedDefinition.workedHours,
                 year,
             }),
         effectiveHours:
-            definition.effectiveHours === 0 ? 0 : definition.workedHours,
-        workedHours: definition.workedHours,
+            resolvedDefinition.effectiveHours === 0
+                ? 0
+                : resolvedDefinition.workedHours,
+        workedHours: resolvedDefinition.workedHours,
     };
 }
 
@@ -134,7 +146,8 @@ function calculateDoubleWorkedHours({
                 segmentStart.getMonth(),
                 segmentStart.getDate(),
                 doubleDateKeys,
-            ) || (isLegalHoliday?.(segmentStart) ?? false);
+            ) ||
+            (isLegalHoliday?.(segmentStart) ?? false);
 
         if (isDoubleSegment) {
             doubleIntervalHours +=
@@ -167,19 +180,40 @@ function getDateTime(
     return new Date(year, monthIndex, day, hour);
 }
 
-function getShiftInterval(
+function resolveShiftDefinition(
     definition: (typeof SCHEDULE_SHIFT_DEFINITIONS)[ScheduleCellCode],
     functie: EmployeeFunction,
-) {
-    if (definition.intervalByFunction !== undefined) {
-        return definition.intervalByFunction[functie];
+): ResolvedShiftDefinition | undefined {
+    if (
+        "intervalByFunction" in definition &&
+        definition.intervalByFunction !== undefined
+    ) {
+        const functionDefinition = definition.intervalByFunction[functie];
+
+        if (!functionDefinition) {
+            return undefined;
+        }
+
+        return {
+            interval: {
+                endHour: functionDefinition.endHour,
+                startHour: functionDefinition.startHour,
+            },
+            workedHours: functionDefinition.workedHours,
+        };
     }
 
-    if (definition.interval !== undefined) {
-        return definition.interval;
+    if ("interval" in definition) {
+        return {
+            interval: definition.interval,
+            workedHours: definition.workedHours,
+        };
     }
 
-    return undefined;
+    return {
+        effectiveHours: definition.effectiveHours,
+        workedHours: definition.workedHours,
+    };
 }
 
 function isScheduleCellCode(value: string): value is ScheduleCellCode {

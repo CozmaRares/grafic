@@ -167,7 +167,7 @@ function RouteComponent() {
                                             ? "border-teal-700 bg-teal-50"
                                             : isNextMonth
                                               ? "border-teal-200 bg-[#f0fdfa]"
-                                            : "border-gray-200 bg-white"
+                                              : "border-gray-200 bg-white"
                                     }`}
                                     key={monthName}
                                     params={{

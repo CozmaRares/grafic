@@ -59,9 +59,13 @@ function renderNotation(value: string) {
     return <span className={className}>{value}</span>;
 }
 
-function renderTimesheetNotation(value: string) {
+function renderTimesheetNotation(value: string, functie: EmployeeFunction) {
     if (value === "" || !isNotationKey(value)) {
         return null;
+    }
+
+    if (functie === "Medic Gardă" && value === "1") {
+        return renderNotation(value);
     }
 
     const mappedNotation = timesheetNotationLabels[value];
@@ -244,17 +248,16 @@ export function TimesheetTable({
                                     : INACTIVE_DAY_MARKER,
                             );
                             const validValues = values.slice(0, daysInMonth);
-                            const dailyHours = validValues.map(
-                                (value, index) =>
-                                    calculateScheduleHours({
-                                        day: index + 1,
-                                        doubleDateKeys: doubleDateKeySet,
-                                        isLegalHoliday,
-                                        monthIndex,
-                                        functie: row.functie,
-                                        shiftCode: value,
-                                        year,
-                                    }),
+                            const dailyHours = validValues.map((value, index) =>
+                                calculateScheduleHours({
+                                    day: index + 1,
+                                    doubleDateKeys: doubleDateKeySet,
+                                    isLegalHoliday,
+                                    monthIndex,
+                                    functie: row.functie,
+                                    shiftCode: value,
+                                    year,
+                                }),
                             );
                             const totalHours = dailyHours.reduce(
                                 (total, hours) => total + hours.effectiveHours,
@@ -323,6 +326,7 @@ export function TimesheetTable({
                                                         ? INACTIVE_DAY_MARKER
                                                         : renderTimesheetNotation(
                                                               value,
+                                                              row.functie,
                                                           )}
                                                 </div>
                                             </td>

@@ -6,7 +6,7 @@ import {
 } from "@/integrations/clerk/middleware";
 
 const csrfMiddleware = createCsrfMiddleware({
-    filter: (ctx) => ctx.handlerType === "serverFn",
+    filter: ctx => ctx.handlerType === "serverFn",
 });
 
 export const startInstance = createStart(() => {

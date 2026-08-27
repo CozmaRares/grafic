@@ -291,85 +291,81 @@ export function ScheduleTable({
         [daysInMonth, rows.length],
     );
 
-    const commitCell = useCallback(
-        () => {
-            const currentEditingCell = editingCellRef.current;
+    const commitCell = useCallback(() => {
+        const currentEditingCell = editingCellRef.current;
 
-            if (!currentEditingCell) {
-                return;
-            }
+        if (!currentEditingCell) {
+            return;
+        }
 
-            const row = rows[currentEditingCell.rowIndex];
-            const value = normalizeNotation(
-                draftValueRef.current,
-                scheduleCellCodes,
-            );
-            const previousValue = row.values[currentEditingCell.day] ?? "";
-
-            editingCellRef.current = null;
-            setEditingCell(null);
-
-            if (value === previousValue) {
-                return;
-            }
-
-            setRows(currentRows =>
-                currentRows.map((currentRow, rowIndex) =>
-                    rowIndex === currentEditingCell.rowIndex
-                        ? {
-                              ...currentRow,
-                              values: {
-                                  ...currentRow.values,
-                                  [currentEditingCell.day]: value,
-                              },
-                          }
-                        : currentRow,
-                ),
-            );
-            setSaveError(null);
-
-            if (saveScheduleCell) {
-                void saveScheduleCell({
-                    employeeId: row.id,
-                    year,
-                    monthIndex,
-                    day: currentEditingCell.day,
-                    compartment,
-                    value,
-                }).catch(error => {
-                    setRows(currentRows =>
-                        currentRows.map(currentRow =>
-                            currentRow.id === row.id &&
-                            (currentRow.values[currentEditingCell.day] ??
-                                "") === value
-                                ? {
-                                      ...currentRow,
-                                      values: {
-                                          ...currentRow.values,
-                                          [currentEditingCell.day]:
-                                              previousValue,
-                                      },
-                                  }
-                                : currentRow,
-                        ),
-                    );
-                    setSaveError(
-                        error instanceof Error
-                            ? error.message
-                            : "Celula nu a putut fi salvată.",
-                    );
-                });
-            }
-        },
-        [
-            compartment,
-            monthIndex,
-            rows,
+        const row = rows[currentEditingCell.rowIndex];
+        const value = normalizeNotation(
+            draftValueRef.current,
             scheduleCellCodes,
-            saveScheduleCell,
-            year,
-        ],
-    );
+        );
+        const previousValue = row.values[currentEditingCell.day] ?? "";
+
+        editingCellRef.current = null;
+        setEditingCell(null);
+
+        if (value === previousValue) {
+            return;
+        }
+
+        setRows(currentRows =>
+            currentRows.map((currentRow, rowIndex) =>
+                rowIndex === currentEditingCell.rowIndex
+                    ? {
+                          ...currentRow,
+                          values: {
+                              ...currentRow.values,
+                              [currentEditingCell.day]: value,
+                          },
+                      }
+                    : currentRow,
+            ),
+        );
+        setSaveError(null);
+
+        if (saveScheduleCell) {
+            void saveScheduleCell({
+                employeeId: row.id,
+                year,
+                monthIndex,
+                day: currentEditingCell.day,
+                compartment,
+                value,
+            }).catch(error => {
+                setRows(currentRows =>
+                    currentRows.map(currentRow =>
+                        currentRow.id === row.id &&
+                        (currentRow.values[currentEditingCell.day] ?? "") ===
+                            value
+                            ? {
+                                  ...currentRow,
+                                  values: {
+                                      ...currentRow.values,
+                                      [currentEditingCell.day]: previousValue,
+                                  },
+                              }
+                            : currentRow,
+                    ),
+                );
+                setSaveError(
+                    error instanceof Error
+                        ? error.message
+                        : "Celula nu a putut fi salvată.",
+                );
+            });
+        }
+    }, [
+        compartment,
+        monthIndex,
+        rows,
+        scheduleCellCodes,
+        saveScheduleCell,
+        year,
+    ]);
 
     const cancelCell = useCallback(() => {
         const currentEditingCell = editingCellRef.current;

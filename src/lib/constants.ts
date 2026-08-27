@@ -16,6 +16,8 @@ export const EMPLOYEE_FUNCTIONS = [
 export type EmployeeFunction = (typeof EMPLOYEE_FUNCTIONS)[number];
 
 export const SCHEDULE_CELL_CODES = [
+    "1",
+    "2",
     "7",
     "16",
     "17",
@@ -26,7 +28,6 @@ export const SCHEDULE_CELL_CODES = [
     "N",
     "C",
     "=",
-    "1",
     "B",
     "CE",
     "CF",
@@ -55,32 +56,38 @@ type ShiftInterval = {
     endHour: number;
 };
 
-type ShiftDefinitionBase = {
+type IntervalShiftDefinitionSimple = {
     workedHours: number;
-};
-
-type IntervalShiftDefinition = ShiftDefinitionBase & {
-    effectiveHours?: never;
     interval: ShiftInterval;
-    intervalByFunction?: never;
 };
 
-type FunctionIntervalShiftDefinition = ShiftDefinitionBase & {
+type IntervalShiftDefinitionByFunctionSingle = {
+    workedHours: number;
+    startHour: number;
+    endHour: number;
+};
+
+type IntervalShiftDefinitionByFunctionMultiple = {
+    intervalByFunction: Partial<
+        Record<EmployeeFunction, IntervalShiftDefinitionByFunctionSingle>
+    >;
+};
+
+type IntervalShiftDefinition = (
+    IntervalShiftDefinitionSimple | IntervalShiftDefinitionByFunctionMultiple
+) & {
     effectiveHours?: never;
-    interval?: never;
-    intervalByFunction: Partial<Record<EmployeeFunction, ShiftInterval>>;
 };
 
-type ZeroEffectiveShiftDefinition = ShiftDefinitionBase & {
+type ZeroEffectiveShiftDefinition = {
+    workedHours: number;
     effectiveHours: 0;
     interval?: never;
     intervalByFunction?: never;
 };
 
 export type ScheduleShiftDefinition =
-    | IntervalShiftDefinition
-    | FunctionIntervalShiftDefinition
-    | ZeroEffectiveShiftDefinition;
+    IntervalShiftDefinition | ZeroEffectiveShiftDefinition;
 
 export const SCHEDULE_SHIFT_DEFINITIONS: Record<
     ScheduleCellCode,
@@ -129,10 +136,44 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
         },
     },
     "1": {
-        workedHours: 8,
+        intervalByFunction: {
+            "As. Șef": {
+                workedHours: 8,
+                startHour: 7,
+                endHour: 15,
+            },
+            "As. Medical": {
+                workedHours: 8,
+                startHour: 7,
+                endHour: 15,
+            },
+            Infirmier: {
+                workedHours: 8,
+                startHour: 7,
+                endHour: 15,
+            },
+            "Îngr. Curățenie": {
+                workedHours: 8,
+                startHour: 7,
+                endHour: 15,
+            },
+            "Registrator Medical": {
+                workedHours: 8,
+                startHour: 7,
+                endHour: 15,
+            },
+            "Medic Gardă": {
+                workedHours: 1,
+                startHour: 14,
+                endHour: 15,
+            },
+        },
+    },
+    "2": {
+        workedHours: 2,
         interval: {
-            startHour: 7,
-            endHour: 15,
+            startHour: 14,
+            endHour: 16,
         },
     },
     Z: {
@@ -143,21 +184,24 @@ export const SCHEDULE_SHIFT_DEFINITIONS: Record<
         },
     },
     N: {
-        workedHours: 12,
         intervalByFunction: {
             "As. Medical": {
+                workedHours: 12,
                 startHour: 19,
                 endHour: 7,
             },
             "As. Șef": {
+                workedHours: 12,
                 startHour: 19,
                 endHour: 7,
             },
             Infirmier: {
+                workedHours: 12,
                 startHour: 18,
                 endHour: 6,
             },
             "Îngr. Curățenie": {
+                workedHours: 12,
                 startHour: 18,
                 endHour: 6,
             },
@@ -218,6 +262,7 @@ export const NOTATII_GRAFIC = {
     "23": { color: COLORS.tura1, type: "normal" },
     "24": { color: COLORS.tura1, type: "normal" },
     "1": { color: COLORS.tura1, type: "normal" },
+    "2": { color: COLORS.tura1, type: "normal" },
     Z: { color: COLORS.tura1, type: "normal" },
     N: { color: COLORS.tura3, type: "normal" },
     C: { color: COLORS.tura1, type: "normal" },
@@ -252,6 +297,8 @@ export const DOCTOR_SCHEDULE_CELL_CODES = [
 ] as const satisfies ReadonlyArray<ScheduleCellCode>;
 
 export const DOCTOR_ON_CALL_SCHEDULE_CELL_CODES = [
+    "1",
+    "2",
     "16",
     "17",
     "18",
