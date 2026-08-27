@@ -1,4 +1,8 @@
-import type { EmployeeFunction, ScheduleCellCode } from "@/lib/constants";
+import type {
+    Compartment,
+    EmployeeFunction,
+    ScheduleCellCode,
+} from "@/lib/constants";
 import { SCHEDULE_SHIFT_DEFINITIONS } from "@/lib/constants";
 
 export type ScheduleHours = {
@@ -8,6 +12,7 @@ export type ScheduleHours = {
 };
 
 type CalculateScheduleHoursParams = {
+    compartment?: Compartment;
     day: number;
     doubleDateKeys: ReadonlySet<string>;
     isLegalHoliday?: (date: Date) => boolean;
@@ -56,6 +61,7 @@ export function isDoubleHoursDate(
 }
 
 export function calculateScheduleHours({
+    compartment,
     day,
     doubleDateKeys,
     isLegalHoliday,
@@ -69,7 +75,11 @@ export function calculateScheduleHours({
     }
 
     const definition = SCHEDULE_SHIFT_DEFINITIONS[shiftCode];
-    const resolvedDefinition = resolveShiftDefinition(definition, functie);
+    const resolvedDefinition = resolveShiftDefinition(
+        definition,
+        functie,
+        compartment,
+    );
 
     if (!resolvedDefinition) {
         return emptyScheduleHours();
@@ -183,12 +193,16 @@ function getDateTime(
 function resolveShiftDefinition(
     definition: (typeof SCHEDULE_SHIFT_DEFINITIONS)[ScheduleCellCode],
     functie: EmployeeFunction,
+    compartment: Compartment | undefined,
 ): ResolvedShiftDefinition | undefined {
     if (
         "intervalByFunction" in definition &&
         definition.intervalByFunction !== undefined
     ) {
-        const functionDefinition = definition.intervalByFunction[functie];
+        const resolvedFunction =
+            compartment === "medici_garda" ? "Medic Gardă" : functie;
+        const functionDefinition =
+            definition.intervalByFunction[resolvedFunction];
 
         if (!functionDefinition) {
             return undefined;

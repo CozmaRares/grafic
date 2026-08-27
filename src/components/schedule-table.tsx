@@ -204,6 +204,7 @@ export function ScheduleTable({
                 (tableTotal, row) =>
                     tableTotal +
                     getRowDoubleHours(row, daysInMonth, {
+                        compartment,
                         doubleDateKeySet,
                         isLegalHoliday,
                         monthIndex,
@@ -529,6 +530,7 @@ export function ScheduleTable({
                                 (total, value, index) =>
                                     total +
                                     calculateScheduleHours({
+                                        compartment,
                                         day: index + 1,
                                         doubleDateKeys: doubleDateKeySet,
                                         isLegalHoliday,
@@ -543,6 +545,7 @@ export function ScheduleTable({
                                 (total, value, index) =>
                                     total +
                                     calculateScheduleHours({
+                                        compartment,
                                         day: index + 1,
                                         doubleDateKeys: doubleDateKeySet,
                                         isLegalHoliday,
@@ -715,8 +718,10 @@ function getRowDoubleHours(
         doubleDateKeySet,
         isLegalHoliday,
         monthIndex,
+        compartment,
         year,
     }: {
+        compartment: Compartment;
         doubleDateKeySet: ReadonlySet<string>;
         isLegalHoliday: (date: Date) => boolean;
         monthIndex: number;
@@ -728,6 +733,7 @@ function getRowDoubleHours(
             rowTotal +
             calculateScheduleHours({
                 day,
+                compartment,
                 doubleDateKeys: doubleDateKeySet,
                 isLegalHoliday,
                 monthIndex,

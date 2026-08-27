@@ -157,6 +157,7 @@ function RouteComponent() {
                             year={year}
                         />
                         <TimesheetTable
+                            compartment={printSchedule.timesheetGroup.compartment}
                             holidayDateKeys={printSchedule.holidayDateKeys}
                             isNextMonthFirstDayHoliday={
                                 printSchedule.isNextMonthFirstDayHoliday

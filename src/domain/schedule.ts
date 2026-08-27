@@ -198,6 +198,7 @@ export function getLiveGroupRows({
 }
 
 export function getRowTotals({
+    compartment,
     daysInMonth,
     doubleDateKeySet,
     isLegalHoliday,
@@ -206,6 +207,7 @@ export function getRowTotals({
     values,
     year,
 }: {
+    compartment?: Compartment;
     daysInMonth: number;
     doubleDateKeySet: ReadonlySet<string>;
     isLegalHoliday?: (date: Date) => boolean;
@@ -217,6 +219,7 @@ export function getRowTotals({
     return Array.from({ length: daysInMonth }, (_, index) => index + 1).reduce(
         (totals, day) => {
             const hours = calculateScheduleHours({
+                compartment,
                 day,
                 doubleDateKeys: doubleDateKeySet,
                 isLegalHoliday,

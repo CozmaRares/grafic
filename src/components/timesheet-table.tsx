@@ -1,4 +1,5 @@
 import type {
+    Compartment,
     EmployeeFunction,
     NotatieGrafic,
     ScheduleCellCode,
@@ -23,6 +24,7 @@ export type TimesheetRow = {
 };
 
 type TimesheetTableProps = {
+    compartment: Compartment;
     holidayDateKeys: Array<string>;
     isNextMonthFirstDayHoliday: boolean;
     monthIndex: number;
@@ -59,12 +61,19 @@ function renderNotation(value: string) {
     return <span className={className}>{value}</span>;
 }
 
-function renderTimesheetNotation(value: string, functie: EmployeeFunction) {
+function renderTimesheetNotation(
+    value: string,
+    functie: EmployeeFunction,
+    compartment: Compartment,
+) {
     if (value === "" || !isNotationKey(value)) {
         return null;
     }
 
-    if (functie === "Medic Gardă" && value === "1") {
+    if (
+        value === "1" &&
+        (functie === "Medic Gardă" || compartment === "medici_garda")
+    ) {
         return renderNotation(value);
     }
 
@@ -101,6 +110,7 @@ function renderTimesheetNotation(value: string, functie: EmployeeFunction) {
 }
 
 export function TimesheetTable({
+    compartment,
     holidayDateKeys,
     isNextMonthFirstDayHoliday,
     monthIndex,
@@ -250,6 +260,7 @@ export function TimesheetTable({
                             const validValues = values.slice(0, daysInMonth);
                             const dailyHours = validValues.map((value, index) =>
                                 calculateScheduleHours({
+                                    compartment,
                                     day: index + 1,
                                     doubleDateKeys: doubleDateKeySet,
                                     isLegalHoliday,
@@ -327,6 +338,7 @@ export function TimesheetTable({
                                                         : renderTimesheetNotation(
                                                               value,
                                                               row.functie,
+                                                              compartment,
                                                           )}
                                                 </div>
                                             </td>

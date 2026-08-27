@@ -380,6 +380,7 @@ function RouteComponent() {
                                 </Link>
                             </div>
                             <TimesheetTable
+                                compartment={group.compartment}
                                 holidayDateKeys={group.holidayDateKeys}
                                 isNextMonthFirstDayHoliday={
                                     group.isNextMonthFirstDayHoliday
