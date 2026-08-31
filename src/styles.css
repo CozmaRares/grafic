@@ -1,3 +1,27 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
+
+@media print {
+    /* Chromium can drop collapsed cell borders when a large table is split
+       across pages. Separate half-point borders add up to one continuous line
+       between cells and survive page fragmentation. */
+    .print-timesheet-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        outline: 0.5pt solid black;
+    }
+
+    .print-timesheet-table :is(th, td) {
+        border-width: 0.5pt;
+    }
+
+    .print-timesheet-table tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .print-timesheet-table thead {
+        display: table-header-group;
+    }
+}

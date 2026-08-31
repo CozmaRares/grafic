@@ -146,7 +146,13 @@ function RouteComponent() {
                 Inapoi
             </Link>
 
-            <div className="space-y-4 p-8 print:flex print:min-h-screen print:flex-col print:justify-center print:space-y-4">
+            <div
+                className={`space-y-4 p-8 print:space-y-4 ${
+                    printSchedule.kind === "timesheet"
+                        ? "print:block print:min-h-0"
+                        : "print:flex print:min-h-screen print:flex-col print:justify-center"
+                }`}
+            >
                 {printSchedule.kind === "timesheet" ? (
                     <>
                         <TimesheetPrintHeader
@@ -157,7 +163,9 @@ function RouteComponent() {
                             year={year}
                         />
                         <TimesheetTable
-                            compartment={printSchedule.timesheetGroup.compartment}
+                            compartment={
+                                printSchedule.timesheetGroup.compartment
+                            }
                             holidayDateKeys={printSchedule.holidayDateKeys}
                             isNextMonthFirstDayHoliday={
                                 printSchedule.isNextMonthFirstDayHoliday

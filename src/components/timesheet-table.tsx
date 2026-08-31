@@ -142,8 +142,8 @@ export function TimesheetTable({
 
     return (
         <section className="space-y-3">
-            <div className="w-full overflow-hidden">
-                <table className="w-full table-fixed border-collapse text-sm font-bold whitespace-nowrap">
+            <div className="w-full overflow-hidden print:overflow-visible">
+                <table className="print-timesheet-table w-full table-fixed border-collapse text-sm font-bold whitespace-nowrap">
                     <colgroup>
                         <col className="w-18" />
                         <col className="w-40" />
