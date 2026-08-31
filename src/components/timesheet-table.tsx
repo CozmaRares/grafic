@@ -323,16 +323,14 @@ export function TimesheetTable({
 
                                         return (
                                             <td
-                                                className="border border-black p-0"
+                                                className={`border border-black p-0 ${
+                                                    isDoubleHours
+                                                        ? "bg-red-100"
+                                                        : ""
+                                                }`}
                                                 key={`${row.id}-${day}`}
                                             >
-                                                <div
-                                                    className={`h-7 w-full overflow-hidden px-0 text-center leading-7 tabular-nums ${
-                                                        isDoubleHours
-                                                            ? "bg-red-100"
-                                                            : ""
-                                                    }`}
-                                                >
+                                                <div className="h-7 w-full overflow-hidden px-0 text-center leading-7 tabular-nums">
                                                     {isInactive
                                                         ? INACTIVE_DAY_MARKER
                                                         : renderTimesheetNotation(
