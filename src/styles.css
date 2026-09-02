@@ -3,7 +3,7 @@
 @import "tw-animate-css";
 
 :root {
-    background-color: red !important;
+    background-color: blue !important;
 }
 
 @media print {
