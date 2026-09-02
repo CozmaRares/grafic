@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  deploy:
+    name: Request production deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger haum deployment
+        env:
+          GH_TOKEN: ${{ secrets.HAUM_DEPLOY_TOKEN }}
+          APP: ${{ github.event.repository.name }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::error::HAUM_DEPLOY_TOKEN is not configured"
+            exit 1
+          fi
+
+          gh workflow run deploy-app.yaml \
+            --repo CozmaRares/haum \
+            --ref main \
+            --field app="$APP" \
+            --field commit="$COMMIT"
