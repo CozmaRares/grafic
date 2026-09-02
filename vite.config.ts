@@ -10,6 +10,23 @@ import { nitro } from "nitro/vite";
 
 const config = defineConfig({
     resolve: { tsconfigPaths: true },
+    build: {
+        rolldownOptions: {
+            checks: { pluginTimings: false },
+            output: {
+                codeSplitting: {
+                    groups: [
+                        {
+                            name: "vendor",
+                            test: /node_modules/,
+                            minSize: 100_000,
+                            maxSize: 350_000,
+                        },
+                    ],
+                },
+            },
+        },
+    },
     plugins: [
         devtools(),
         nitro({ rollupConfig: { external: [/^@sentry\//] } }),
