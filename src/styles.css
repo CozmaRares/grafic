@@ -2,10 +2,6 @@
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 
-:root {
-    background-color: red !important;
-}
-
 @media print {
     /* Chromium can drop collapsed cell borders when a large table is split
        across pages. Separate half-point borders add up to one continuous line
